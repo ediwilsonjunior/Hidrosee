@@ -1,34 +1,4 @@
-"use strict";
-/* FluxoVerde DERP v3.1 - bundle classico sem modulos. */
-const load=(k,fallback)=>{try{return JSON.parse(localStorage.getItem(k))||structuredClone(fallback)}catch{return structuredClone(fallback)}};const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const autonomy=i=>i.daily>0?i.qty/i.daily:null;
-const impactMargin=(lead,risk,factor=.50)=>Math.ceil(lead*(risk/100)*factor);
-const etaDays=(lead,risk,factor=.50)=>lead+impactMargin(lead,risk,factor);
-const advanceDays=(risk,base=3)=>Math.round(base+risk*.1);
-function project(item,daysCount,purchases,risk,fallbackFactor=.50,routes=[]){
- const points=[];let stock=item.qty;
- for(let d=0;d<=daysCount;d++){
-  for(const p of purchases){
-   const route=routes.find(r=>r.id===p.route);
-   const factor=route?.impactFactor??fallbackFactor;
-   const arrival=etaDays(p.baseDays,p.risk??risk,factor);
-   if(arrival===d) stock+=p.items.filter(x=>x.productId===item.id).reduce((a,x)=>a+x.qty,0);
-  }
-  points.push(Math.max(0,stock));stock-=item.daily||0;
- }
- return points;
-}
-const reorderDate=(item,risk,safety=10)=>{const a=autonomy(item);if(a===null)return null;return Math.max(0,Math.floor(a-safety-advanceDays(risk)))};
-const observedFactor=(baseDays,actualDays,risk)=>{const delay=actualDays-baseDays;return baseDays>0&&risk>0?delay/(baseDays*(risk/100)):null};
-
-const organizations=[{id:"cema",name:"CEMA Amazonas",type:"central"},{id:"ubs1",name:"UBS Rio Negro",type:"unit"},{id:"ubs2",name:"Hospital Regional de Tefé",type:"unit"},{id:"log1",name:"Logística Norte",type:"logistics"},{id:"log2",name:"RioMed Transportes",type:"logistics"}];
-const seed={settings:{risk:64,fallbackFactor:.50,safetyDays:10,horizon:45,riverLevel:-1.7,factorCalibrated:false},inventory:[{id:1,org:"cema",product:"Soro fisiológico 500 ml",sku:"SF-500",qty:2840,min:1800,daily:95,unit:"frascos",priority:"Alta"},{id:2,org:"cema",product:"Amoxicilina 500 mg",sku:"AMX-500",qty:6200,min:4500,daily:210,unit:"cápsulas",priority:"Média"},{id:3,org:"ubs1",product:"Soro fisiológico 500 ml",sku:"SF-500",qty:148,min:180,daily:12,unit:"frascos",priority:"Alta"},{id:4,org:"ubs1",product:"Luvas de procedimento",sku:"LUV-M",qty:1220,min:900,daily:75,unit:"unidades",priority:"Média"},{id:5,org:"ubs1",product:"Seringas 10 ml",sku:"SER-10",qty:0,min:400,daily:0,unit:"unidades",priority:"Crítica"},{id:6,org:"ubs2",product:"Amoxicilina 500 mg",sku:"AMX-500",qty:320,min:500,daily:28,unit:"cápsulas",priority:"Alta"},{id:7,org:"ubs2",product:"Gaze estéril",sku:"GAZ-10",qty:740,min:600,daily:43,unit:"pacotes",priority:"Média"}],movements:[{id:"MOV-1001",org:"ubs1",productId:3,type:"Saída por consumo",qty:24,before:172,after:148,at:"22/10/2026 16:20",user:"Carlos Lima",reason:"Consumo diário"}],suppliers:[{id:"FOR-1",name:"MedNorte Suprimentos",lead:4,onTime:92,products:[1,2,3,4,5,6,7]},{id:"FOR-2",name:"Amazon Health",lead:6,onTime:86,products:[1,3,6]}],routes:[
-{id:"ROT-1",from:"Manaus",to:"Tefé",normal:5,drought:8,mode:"Fluvial",sensitivity:"Moderada",impactFactor:.65,factorSource:"Hipótese demonstrativa"},
-{id:"ROT-2",from:"Manaus",to:"Manaus",normal:2,drought:2,mode:"Urbano-fluvial",sensitivity:"Urbana",impactFactor:.10,factorSource:"Hipótese demonstrativa"},
-{id:"ROT-3",from:"Manaus",to:"Carauari",normal:7,drought:10,mode:"Fluvial",sensitivity:"Baixa",impactFactor:.35,factorSource:"Hipótese demonstrativa"},
-{id:"ROT-4",from:"Manaus",to:"Eirunepé",normal:9,drought:15,mode:"Fluvial",sensitivity:"Alta",impactFactor:.90,factorSource:"Hipótese demonstrativa"}
-],purchases:[{id:"CMP-2405",buyer:"ubs2",supplier:"FOR-1",route:"ROT-1",company:"log1",status:"Em trânsito",baseDays:5,risk:64,progress:61,items:[{productId:6,requested:800,approved:700,shipped:700,received:0}],events:[{at:"18/10/2026 10:00",text:"Pedido aprovado"},{at:"20/10/2026 07:00",text:"Saiu de Manaus"},{at:"22/10/2026 14:10",text:"Última atualização: proximidades de Coari"}]},{id:"CMP-2408",buyer:"ubs1",supplier:"FOR-2",route:"ROT-2",company:"log2",status:"Em separação",baseDays:2,risk:18,progress:32,items:[{productId:3,requested:300,approved:300,shipped:0,received:0}],events:[{at:"21/10/2026 09:00",text:"Pedido emitido"},{at:"22/10/2026 11:15",text:"Separação iniciada"}]}],alerts:[{id:1,org:"ubs1",severity:"critical",title:"Seringas sem estoque",detail:"Estoque abaixo do mínimo e consumo indisponível.",done:false},{id:2,org:"ubs2",severity:"warn",title:"Amoxicilina com autonomia baixa",detail:"Compra CMP-2405 em trânsito.",done:false},{id:3,org:"cema",severity:"warn",title:"Risco de estiagem elevado",detail:"Reavaliar rotas fluviais para os próximos 45 dias.",done:false}]};
-import {organizations,seed} from "./seed.js";import {autonomy,impactMargin,etaDays,advanceDays,project,reorderDate,observedFactor} from "./calculations.js";
+import {load,save} from "./storage.js";import {organizations,seed} from "./seed.js";import {autonomy,impactMargin,etaDays,advanceDays,project,reorderDate,observedFactor} from "./calculations.js";
 const KEY="fluxoverde_v2";let db=load(KEY,seed),activeOrg=localStorage.getItem("fv_org")||"cema",page=location.hash.slice(1)||"dashboard";const $=(s,p=document)=>p.querySelector(s),$$=(s,p=document)=>[...p.querySelectorAll(s)],org=id=>organizations.find(o=>o.id===id),item=id=>db.inventory.find(i=>i.id===+id),route=id=>db.routes.find(r=>r.id===id),supplier=id=>db.suppliers.find(s=>s.id===id),persist=()=>save(KEY,db),fmt=n=>new Intl.NumberFormat("pt-BR").format(n);
 const nav=[["OPERAÇÃO",[["dashboard","Visão geral"],["inventory","Estoque"],["movements","Movimentações"],["purchases","Compras e entregas"]]],["PLANEJAMENTO",[["replenishment","Reposição climática"],["routes","Rotas"],["alerts","Alertas"]]],["CADASTROS",[["suppliers","Fornecedores"],["organizations","Organizações"],["settings","Parâmetros"]]]];
 const badge=s=>`<span class="badge ${/Crítica|Recus|Atras/.test(s)?"danger":/Alta|Aguardando|separação/.test(s)?"warn":/trânsito/.test(s)?"info":"ok"}">${s}</span>`;function toast(t){$("#toast").textContent=t;$("#toast").classList.add("show");setTimeout(()=>$("#toast").classList.remove("show"),2200)}function ph(t,s,a=""){return `<header class="page-head"><div><h2>${t}</h2><p>${s}</p></div><div class="actions">${a}</div></header>`}
