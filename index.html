@@ -1,1 +1,59 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="FluxoVerde DERP demonstrativo"><title>FluxoVerde DERP v2</title><link rel="stylesheet" href="css/styles.css"></head><body><div id="app"><aside id="sidebar"><a class="brand" href="#dashboard"><span>FV</span><b>FluxoVerde<small>DERP AMAZÔNIA</small></b></a><nav id="nav"></nav><button id="reset" class="ghost">Restaurar demonstração</button></aside><section class="workspace"><header class="topbar"><button id="menu" class="icon" aria-label="Abrir menu">☰</button><div><small id="crumb">CEMA Amazonas</small><h1 id="title">Central operacional</h1></div><label>Organização<select id="org"></select></label></header><div class="notice"><b>Protótipo:</b> dados, previsões e riscos são demonstrativos; não constituem previsão oficial.</div><main id="content" tabindex="-1"></main></section></div><div id="modal"></div><div id="toast" role="status"></div><script type="module" src="js/app.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="HidroSee - inteligência logística para abastecimento de UBS do Amazonas">
+  <meta name="theme-color" content="#5E6737">
+  <title>HidroSee</title>
+  <link rel="icon" type="image/svg+xml" href="assets/app-icon.png">
+  <link rel="stylesheet" href="css/styles.css?v=7">
+</head>
+<body>
+  <section id="login-screen" class="login-screen">
+    <div class="login-visual" role="img" aria-label="Paisagem amazônica estilizada">
+      <div class="visual-copy">
+        <span class="eyebrow">INTELIGÊNCIA LOGÍSTICA EM SAÚDE</span>
+        <h1>Antecipe a estiagem.<br>Proteja o abastecimento.</h1>
+        <div class="route-flow"><span>Outras regiões</span><i>→</i><span>Manaus</span><i>→</i><span>UBS</span></div>
+      </div>
+    </div>
+    <div class="login-panel">
+      <form id="login-form" class="login-card">
+        <div class="login-brand"><img src="assets/app-icon.png" alt="Ícone HidroSee"><div><b>HidroSee</b><small>CEMA AMAZONAS</small></div></div>
+        <div><p class="eyebrow">ACESSO INSTITUCIONAL</p><h2>Bem-vindo ao painel</h2></div>
+        <label>Usuário<input id="login-user" autocomplete="username" value="cema" required></label>
+        <label>Senha<input id="login-password" type="password" autocomplete="current-password" value="hidrosee" required></label>
+        <p id="login-error" class="form-error" role="alert"></p>
+        <button class="primary wide" type="submit">Entrar no painel</button>
+        <small class="demo-hint">Demonstração: usuário <b>cema</b> · senha <b>hidrosee</b></small>
+      </form>
+    </div>
+  </section>
+  <div id="app" class="app hidden">
+    <aside id="sidebar">
+      <a class="brand" href="#dashboard"><img src="assets/app-icon.png" alt="Ícone HidroSee"><b>HidroSee<small>CEMA AMAZONAS</small></b></a>
+      <nav id="nav"></nav>
+      <div class="side-status"><span class="pulse"></span><div><b>Monitoramento ativo</b><small>Atualização demonstrativa</small></div></div>
+      <button id="reset" class="ghost">↻ Restaurar demonstração</button>
+      <button id="logout" class="ghost danger">Sair do perfil</button>
+    </aside>
+    <section class="workspace">
+      <header class="topbar">
+        <button id="menu" class="icon" aria-label="Abrir menu">☰</button>
+        <div><small id="crumb">CEMA Amazonas</small><h1 id="title">Central de risco logístico</h1></div>
+        <div class="top-actions">
+          <label>Organização<select id="org"><option>CEMA Amazonas</option><option>SES-AM</option><option>Central de Abastecimento</option></select></label>
+          <button id="alerts-button" class="asset-button" aria-label="Abrir notificações"><img src="assets/notification-icon.png" alt=""><b>4</b></button>
+          <button class="account-button" type="button" aria-label="Perfil CEMA"><img src="assets/account-icon.png" alt="Foto do perfil"></button>
+        </div>
+      </header>
+      <div class="notice"><b>Protótipo acadêmico:</b> dados, previsões e riscos são demonstrativos e não constituem previsão oficial.</div>
+      <main id="content" tabindex="-1"></main>
+    </section>
+  </div>
+  <div id="modal" class="modal-root" aria-live="polite"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="js/app.js?v=7"></script>
+</body>
+</html>
