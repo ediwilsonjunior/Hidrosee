@@ -9,26 +9,8 @@ function unitProduct(ci,pi){const d=data(ci,pi);return{id:ci+1,name:`UBS ${munic
 function allInventory(){return municipalities.flatMap((_,ci)=>products.map((_,pi)=>unitProduct(ci,pi)))}
 function worstAlerts(){const rank={Crítico:0,Alto:1,Moderado:2,Baixo:3};return municipalities.map((_,ci)=>products.map((_,pi)=>unitProduct(ci,pi)).sort((a,b)=>rank[a.risk]-rank[b.risk]||a.margin-b.margin)[0]).sort((a,b)=>rank[a.risk]-rank[b.risk]||a.margin-b.margin)}
 
-const nav=[['dashboard','▦','Visão estadual'],['rotas','⇄','Risco de entrada'],['simulador','◉','Simulador de reposição'],['ubs','✚','UBS monitoradas'],['alertas','!','Alertas'],['relatorios','▤','Relatórios']];
-const hiddenNav=[['estoque','▥','Estoque'],['desenvolvedor','</>','Desenvolvedor']];
-let hiddenMode=false;
-function unlockHiddenMode(){
- if(hiddenMode)return;
- hiddenMode=true;
- sessionStorage.setItem('hidrosee-hidden-mode','1');
- hiddenNav.forEach(item=>{if(!nav.some(x=>x[0]===item[0]))nav.push(item)});
- const navElement=document.getElementById('nav');
- if(navElement){
-  navElement.innerHTML=nav.map(x=>`<a href="#${x[0]}" data-route="${x[0]}"><span>${x[1]}</span>${x[2]}</a>`).join('');
-  $$('#nav a').forEach(x=>x.classList.toggle('active',x.dataset.route===location.hash.slice(1)));
- }
- toast('Modo HidroSee Interno ativado');
-}
-function lockHiddenMode(){
- hiddenMode=false;
- sessionStorage.removeItem('hidrosee-hidden-mode');
- hiddenNav.forEach(item=>{const i=nav.findIndex(x=>x[0]===item[0]);if(i>=0)nav.splice(i,1)});
-}
+const nav=[['dashboard','▦','Visão estadual'],['rotas','⇄','Risco de entrada'],['simulador','◉','Simulador de reposição'],['ubs','✚','UBS monitoradas'],['alertas','!','Alertas'],['relatorios','▤','Relatórios'],['estoque','▥','Estoque'],['desenvolvedor','</>','Desenvolvedor']];
+let siteUnlocked=false;
 function pill(r){const cls=r==='Crítico'?'critical':r==='Alto'?'high':r==='Moderado'?'medium':'low';return`<span class="pill ${cls}">${r}</span>`}function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function head(k,t,d,a=''){return`<div class="page-head"><div><span class="eyebrow">${k}</span><h2>${t}</h2><p>${d}</p></div>${a}</div>`}
 function metrics(){const c=ubs.filter(x=>['Crítico','Alto'].includes(x.risk)).length;return`<section class="metrics"><div class="metric"><div class="metric-top">Índice HidroSee</div><strong>74</strong><span class="trend risk">Risco demonstrativo alto</span></div><div class="metric"><div class="metric-top">Municípios</div><strong>62</strong><span class="trend">Cobertura estadual</span></div><div class="metric"><div class="metric-top">Lead time médio</div><strong>${Math.round(ubs.reduce((s,x)=>s+x.lead,0)/62)} dias</strong></div><div class="metric"><div class="metric-top">Prioridades</div><strong>${c}</strong><span class="trend risk">Alto ou crítico</span></div></section>`}
@@ -51,17 +33,7 @@ function developer(){return head('DOCUMENTACAO TECNICA','Area do desenvolvedor',
 
 const pages={dashboard,rotas,simulador:simulator,ubs:ubsPage,alertas,relatorios:reports,estoque,desenvolvedor:developer};
 function bind(route){$$('[data-go]').forEach(x=>x.onclick=()=>go(x.dataset.go));if(route==='simulador'){$('#sim-form').onsubmit=calc;$('#sim-city').onchange=loadData;$('#sim-item').onchange=loadData;loadData()}if(route==='ubs'){$('#search').oninput=fill;$('#filter').onchange=fill;$('#ubs-product').onchange=fill;fill()}if(route==='estoque'){$('#stock-search').oninput=fillStock;$('#stock-product').onchange=fillStock;$('#stock-risk').onchange=fillStock;fillStock()}$('#plan')?.addEventListener('click',()=>report('plan'));$$('.report').forEach(x=>x.onclick=()=>report(x.dataset.kind))}
-function go(r){
- if((r==='estoque'||r==='desenvolvedor')&&!hiddenMode)r='dashboard';
- r=pages[r]?r:'dashboard';
- if(location.hash.slice(1)!==r)location.hash=r;
- $('#content').innerHTML=pages[r]();
- $$('#nav a').forEach(x=>x.classList.toggle('active',x.dataset.route===r));
- const page=[...nav,...hiddenNav].find(x=>x[0]===r);
- if(page)$('#title').textContent=page[2];
- $('#sidebar').classList.remove('open');
- bind(r);
-}
+function go(r){r=pages[r]?r:'dashboard';if(location.hash.slice(1)!==r)location.hash=r;$('#content').innerHTML=pages[r]();$$('#nav a').forEach(x=>x.classList.toggle('active',x.dataset.route===r));const page=nav.find(x=>x[0]===r);if(page)$('#title').textContent=page[2];$('#sidebar').classList.remove('open');bind(r);}
 function show(){ $('#login-screen').classList.add('hidden');$('#app').classList.remove('hidden');$('#nav').innerHTML=nav.map(x=>`<a href="#${x[0]}" data-route="${x[0]}"><span>${x[1]}</span>${x[2]}</a>`).join('');go(location.hash.slice(1)||'dashboard')}
 function performLogin(event){
  if(event) event.preventDefault();
@@ -83,15 +55,18 @@ function performLogin(event){
  show();
  return false;
 }
+function unlockSite(){
+ if(siteUnlocked)return;
+ siteUnlocked=true;
+ document.documentElement.classList.remove('site-locked');
+ document.getElementById('hidden-gate-style')?.remove();
+ document.getElementById('login-user')?.focus();
+}
 function initializeApp(){
- if(sessionStorage.getItem('hidrosee-hidden-mode')==='1'){
-  hiddenMode=true;
-  hiddenNav.forEach(item=>{if(!nav.some(x=>x[0]===item[0]))nav.push(item)});
- }
  document.addEventListener('keydown',event=>{
   if(event.ctrlKey&&event.shiftKey&&event.key.toLowerCase()==='h'){
    event.preventDefault();
-   unlockHiddenMode();
+   unlockSite();
   }
  });
  // Delegacao evita falha mesmo se o formulario for recriado ou o script carregar antes do HTML.
@@ -108,7 +83,6 @@ function initializeApp(){
  document.getElementById('menu')?.addEventListener('click',()=>document.getElementById('sidebar')?.classList.toggle('open'));
  document.getElementById('logout')?.addEventListener('click',()=>{
   sessionStorage.removeItem('hidrosee-auth');
-  lockHiddenMode();
   location.hash='';
   location.reload();
  });

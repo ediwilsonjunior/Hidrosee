@@ -1,13 +1,14 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="site-locked">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="HidroSee - inteligência logística para abastecimento de UBS do Amazonas">
   <meta name="theme-color" content="#5E6737">
-  <title>HidroSee</title>
+  <title>HidroSee | CEMA Amazonas</title>
   <link rel="icon" type="image/svg+xml" href="assets/app-icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=7">
+  <link rel="stylesheet" href="css/styles.css?v=8">
+  <style id="hidden-gate-style">html.site-locked body{visibility:hidden!important;background:#000!important}html.site-locked body>*{display:none!important}</style>
 </head>
 <body>
   <section id="login-screen" class="login-screen">
@@ -15,13 +16,14 @@
       <div class="visual-copy">
         <span class="eyebrow">INTELIGÊNCIA LOGÍSTICA EM SAÚDE</span>
         <h1>Antecipe a estiagem.<br>Proteja o abastecimento.</h1>
+        <p>Planejamento de reposição de insumos médicos para as UBS dos 62 municípios do Amazonas.</p>
         <div class="route-flow"><span>Outras regiões</span><i>→</i><span>Manaus</span><i>→</i><span>UBS</span></div>
       </div>
     </div>
     <div class="login-panel">
       <form id="login-form" class="login-card">
         <div class="login-brand"><img src="assets/app-icon.png" alt="Ícone HidroSee"><div><b>HidroSee</b><small>CEMA AMAZONAS</small></div></div>
-        <div><p class="eyebrow">ACESSO INSTITUCIONAL</p><h2>Bem-vindo ao painel</h2></div>
+        <div><p class="eyebrow">ACESSO INSTITUCIONAL</p><h2>Bem-vindo ao painel</h2><p class="muted">Entre com o perfil demonstrativo do CEMA.</p></div>
         <label>Usuário<input id="login-user" autocomplete="username" value="cema" required></label>
         <label>Senha<input id="login-password" type="password" autocomplete="current-password" value="hidrosee" required></label>
         <p id="login-error" class="form-error" role="alert"></p>
@@ -54,6 +56,6 @@
   </div>
   <div id="modal" class="modal-root" aria-live="polite"></div>
   <div id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="js/app.js?v=7"></script>
+  <script type="module" src="js/app.js?v=8"></script>
 </body>
 </html>
